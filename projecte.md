@@ -265,7 +265,7 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 - [ ] Menú contextual (clic dret)
 - [ ] Accions: iniciar, pausar, reiniciar, saltar, tancar
 - [ ] Canvi de perfil des del menú contextual
-- [ ] Drag de finestra
+- [x] Drag de finestra
 
 ### Fase 3 — Comportament de finestra
 - [ ] Opacitat configurable
@@ -273,8 +273,8 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 - [ ] Mides S/M/L
 
 ### Fase 4 — Notificacions
-- [ ] Integració rodio + tres sons inclosos (treball, descans curt, descans llarg)
-- [ ] Flash visual en canvi de fase
+- [x] Integració rodio + tres sons inclosos (treball, descans curt, descans llarg)
+- [x] Flash visual en canvi de fase
 - [ ] Comptador de cicles visible a la UI (perfil Clàssic)
 
 ### Fase 5 — Configuració
