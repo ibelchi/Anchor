@@ -26,6 +26,8 @@ pub struct App {
     pub initialized: bool,
     pub hwnd: Option<isize>,
     pub overlay_hwnd: Option<isize>,
+    pub audio_manager: crate::audio::AudioManager,
+    pub config: crate::config::Config,
 }
 
 impl App {
@@ -44,11 +46,28 @@ impl App {
             initialized: false,
             hwnd: None,
             overlay_hwnd: None,
+            audio_manager: crate::audio::AudioManager::new(),
+            config: crate::config::Config::default(),
         }
     }
 
     pub fn set_opacity(&mut self, value: f32) {
         self.base_opacity = value.clamp(0.1, 1.0);
+    }
+
+    fn handle_phase_transition(&mut self, transition: crate::timer::PhaseTransition) {
+        self.ui_state.flash.start();
+
+        if self.config.sound_enabled {
+            let sound_event = match transition {
+                crate::timer::PhaseTransition::WorkEnded => crate::audio::SoundEvent::WorkEnd,
+                crate::timer::PhaseTransition::ShortBreakEnded => crate::audio::SoundEvent::ShortBreakEnd,
+                crate::timer::PhaseTransition::LongBreakEnded => crate::audio::SoundEvent::LongBreakEnd,
+            };
+            self.audio_manager.play(sound_event, self.config.volume);
+        }
+
+        self.timer.advance_phase(&self.active_profile);
     }
 }
 
@@ -96,7 +115,9 @@ impl eframe::App for App {
         if elapsed >= 1 {
             if self.timer.running {
                 for _ in 0..elapsed {
-                    self.timer.tick(&self.active_profile);
+                    if let Some(transition) = self.timer.update(1, &self.active_profile) {
+                        self.handle_phase_transition(transition);
+                    }
                 }
             }
             self.last_tick += std::time::Duration::from_secs(elapsed);
