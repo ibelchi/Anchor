@@ -309,6 +309,46 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 - So personalitzat (fitxer extern configurable)
 - Versió Linux/macOS si egui ho permet sense canvis majors
 
+## 11. Estat actual d'implementació i bugs oberts
+
+### Fases completades
+- Fase 1 ✅ Esquelet funcional (timer, cicle, perfils)
+- Fase 2 ✅ Interacció (drag, accions)
+- Fase 3 ✅ Comportament de finestra (opacitat, click-through, mides S/M/L)
+- Fase 4 ✅ Notificacions (so + flash visual)
+- Fase 5 ✅ Configuració (parcial — vegeu bugs oberts)
+
+### Arquitectura actual (diferències respecte al disseny original)
+- El menú contextual ha estat eliminat. En el seu lloc:
+  - **Clic dret** sobre la icona grip → obre finestra de Settings
+  - **Clic esquerre mantingut** sobre la icona grip → drag de la finestra
+- La icona grip és a la cantonada inferior dreta de la finestra
+- La finestra Settings s'obre com a viewport secundari (`show_viewport_immediate`) a la dreta de la finestra principal
+- L'overlay Win32 (`anchor_overlay_v2`) cobreix tota la finestra i gestiona els events de ratolí:
+  - `WM_NCHITTEST` → `HTTRANSPARENT` fora del grip, `HTCLIENT` dins
+  - `WM_RBUTTONDOWN` → `RCLICK_DETECTED: AtomicBool`
+  - `WM_LBUTTONDOWN` dins grip → `DRAG_DETECTED: AtomicBool`
+
+### Bug obert crític: Settings no s'obre de forma consistent
+**Símptomes:** La finestra de Settings s'obre correctament les primeres 1-2 execucions de l'app, però a partir de la 3a execució el viewport es crea (`show_settings=true`, posició calculada correctament) paintòmicament però no apareix visualment.
+
+**Diagnosi fins ara:**
+- L'overlay rep els clics correctament sempre (verificat amb log)
+- `RCLICK_DETECTED` es processa correctament a `app.rs` sempre
+- `show_settings=true` s'estableix correctament sempre
+- `show_viewport_immediate` rep els paràmetres correctes sempre
+- El viewport simplement no es renderitza a partir de la 3a execució
+- Usar `ViewportId` únic per obertura (`settings_viewport_id: u64` incrementat) millora el comportament però no el soluciona del tot
+
+**Hipòtesi actual:** Bug intern d'eframe amb `show_viewport_immediate` quan el mateix ViewportId (o similar) s'ha usat en sessions anteriors. Possible solució alternativa: implementar Settings com un procés/thread separat amb la seva pròpia instància eframe, o explorar `show_viewport_deferred` amb arquitectura de missatges per evitar el borrowing.
+
+**Fitxers rellevants:** `src/ui/settings.rs`, `src/app.rs`, `src/window.rs`
+
+### Altres millores pendents de Fase 5
+- Persistència de posició de finestra (window_x/window_y al config.toml) — l'estructura és al config però no es desa/restaura encara
+- El canvi de perfil des de Settings no actualitza `active_profile` a `app.rs` (només actualitza el config)
+- Els logs de debug a `C:/temp/anchor_log.txt` han de ser eliminats abans de la build final
+
 ---
 
 *Fi del document de projecte v1.1*
