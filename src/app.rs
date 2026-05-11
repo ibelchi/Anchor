@@ -27,7 +27,7 @@ pub struct App {
     pub hwnd: Option<isize>,
     pub overlay_hwnd: Option<isize>,
     pub audio_manager: crate::audio::AudioManager,
-    pub config: crate::config::Config,
+    pub config: crate::config::AppConfig,
 }
 
 impl App {
@@ -47,7 +47,7 @@ impl App {
             hwnd: None,
             overlay_hwnd: None,
             audio_manager: crate::audio::AudioManager::new(),
-            config: crate::config::Config::default(),
+            config: crate::config::AppConfig::load(),
         }
     }
 
@@ -58,13 +58,13 @@ impl App {
     fn handle_phase_transition(&mut self, transition: crate::timer::PhaseTransition) {
         self.ui_state.flash.start();
 
-        if self.config.sound_enabled {
+        if self.config.global.sound_enabled {
             let sound_event = match transition {
                 crate::timer::PhaseTransition::WorkEnded => crate::audio::SoundEvent::WorkEnd,
                 crate::timer::PhaseTransition::ShortBreakEnded => crate::audio::SoundEvent::ShortBreakEnd,
                 crate::timer::PhaseTransition::LongBreakEnded => crate::audio::SoundEvent::LongBreakEnd,
             };
-            self.audio_manager.play(sound_event, self.config.volume);
+            self.audio_manager.play(sound_event, self.config.global.volume);
         }
 
         self.timer.advance_phase(&self.active_profile);

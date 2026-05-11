@@ -20,17 +20,28 @@ fn main() -> Result<(), eframe::Error> {
         ..Default::default()
     };
 
-    let default_profile = Profile {
-        kind: ProfileKind::Classic,
-        work_secs: 25 * 60,
-        short_break_secs: 5 * 60,
-        long_break_secs: 15 * 60,
-        cycles_before_long: 4,
+    let config = config::AppConfig::load();
+    let profile_name = &config.global.active_profile_name;
+    let profile_cfg = config.profiles.get(profile_name)
+        .or_else(|| config.profiles.get("classic"))
+        .cloned()
+        .unwrap_or_default();
+
+    let active_profile = Profile {
+        kind: if profile_name == "classic" {
+            ProfileKind::Classic
+        } else {
+            ProfileKind::NoLongBreak
+        },
+        work_secs: profile_cfg.work_duration_secs as u64,
+        short_break_secs: profile_cfg.short_break_secs as u64,
+        long_break_secs: profile_cfg.long_break_secs.unwrap_or(0) as u64,
+        cycles_before_long: profile_cfg.cycles_before_long_break.unwrap_or(4),
     };
 
     eframe::run_native(
         "anchor",
         options,
-        Box::new(|_cc| Box::new(App::new(default_profile)) as Box<dyn eframe::App>),
+        Box::new(|_cc| Box::new(App::new(active_profile)) as Box<dyn eframe::App>),
     )
 }
