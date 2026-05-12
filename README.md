@@ -1,4 +1,4 @@
-# anchor
+# Anchor
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/platform-Windows-blue)](https://github.com/ibelchi/anchor/releases)
