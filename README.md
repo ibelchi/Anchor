@@ -2,15 +2,16 @@
 
 A lightweight, always-on-top Pomodoro timer for Windows. Lives as a floating, translucent window that stays out of your way until you need it.
 
-> **Status:** Work in progress — phases 1–4.2 implemented
+> **Status:** Work in progress — phases 1–5 implemented (except settings UI)
 
 ---
 
 ## Features
 
 - **Floating & translucent** — sits on top of all windows at low opacity; barely noticeable while you work
-- **Click-through** — clicks pass through the window except for the central timer zone
-- **Right-click menu** — all controls accessible in two steps or fewer
+- **Fully interactive** — clicks work anywhere on the window; click-through has been removed for simpler interaction
+- **Controls on window** — close button, nav buttons, and play/pause accessible directly on the window
+- **Right-click menu** — additional controls accessible in two steps or fewer
 - **Two profiles** — Classic (with long break) and No Long Break
 - **Visual flash** — window pulses on phase transitions so you notice without being interrupted
 - **Audio notifications** — distinct sounds for work end, short break end, and long break end, embedded in the binary
@@ -88,8 +89,8 @@ The binary will be at `target/release/anchor.exe`. Copy it anywhere and run it �
 - [x] Phase 3 — Window behaviour (opacity, click-through, sizes)
 - [x] Phase 4.1 — Audio notifications
 - [x] Phase 4.2 — Visual flash on phase change
-- [ ] Phase 4.3 — Cycle counter UI
-- [ ] Phase 5 — Settings panel & config persistence
+- [x] Phase 4.3 — Cycle counter UI
+- [/] Phase 5 — Config persistence (Settings UI removed)
 - [ ] Phase 6 — Polish, DPI testing, release build
 
 ---

@@ -273,9 +273,9 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 - [ ] Comptador de cicles visible a la UI (perfil Clàssic)
 
 ### Fase 5 — Configuració
-- [ ] Estructura Config + serde/toml amb paràmetres per perfil
-- [ ] Panell de configuració UI (pestanyes per perfil)
-- [ ] Persistència de posició i configuració
+- [x] Estructura Config + serde/toml amb paràmetres per perfil
+- [ ] Panell de configuració UI (eliminat a favor d'edició manual)
+- [x] Persistència de posició i configuració
 
 ### Fase 6 — Poliment
 - [ ] Colors per fase (treball, descans curt, descans llarg) configurables per perfil
@@ -311,7 +311,7 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 - Fase 2 ✅ Interacció (drag, accions)
 - Fase 3 ✅ Comportament de finestra (opacitat, click-through, mides S/M/L)
 - Fase 4 ✅ Notificacions (so + flash visual)
-- Fase 5 ⚠️ Parcialment completada: la UI de Settings ha estat eliminada. La configuració es gestiona editant manualment el fitxer config.toml a la mateixa carpeta de l'executable.
+- Fase 5 ⚠️ Parcialment completada: la UI de Settings ha estat eliminada (la configuració es gestiona editant manualment el fitxer config.toml), però s'ha implementat la persistència de la posició de la finestra.
 
 ### Arquitectura actual (diferències respecte al disseny original)
 - S'han afegit controls a la finestra:
@@ -320,10 +320,6 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
   - Inferior dreta: Botó de Play/Pause [⏵]/[⏸] i grip de drag.
 - S'ha eliminat el click-through. La finestra és completament interactuable a tot arreu.
 - S'ha eliminat l'overlay Win32.
-
-
-### Altres millores pendents de Fase 5
-- Persistència de posició de finestra (window_x/window_y al config.toml) — l'estructura és al config però no es desa/restaura encara
 
 ---
 

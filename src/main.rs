@@ -10,17 +10,23 @@ use eframe::egui;
 use timer::{Profile, ProfileKind};
 
 fn main() -> Result<(), eframe::Error> {
+    let config = config::AppConfig::load();
+    
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_inner_size([180.0, 90.0])
+        .with_always_on_top()
+        .with_decorations(false)
+        .with_transparent(true)
+        .with_title("anchor");
+
+    if let (Some(x), Some(y)) = (config.global.window_x, config.global.window_y) {
+        viewport = viewport.with_position(egui::pos2(x, y));
+    }
+
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([180.0, 90.0])
-            .with_always_on_top()
-            .with_decorations(false)
-            .with_transparent(true)
-            .with_title("anchor"),
+        viewport,
         ..Default::default()
     };
-
-    let config = config::AppConfig::load();
     let profile_name = &config.global.active_profile_name;
     let profile_cfg = config.profiles.get(profile_name)
         .or_else(|| config.profiles.get("classic"))

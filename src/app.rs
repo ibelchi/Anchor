@@ -111,5 +111,16 @@ impl eframe::App for App {
         egui::CentralPanel::default().frame(frame).show(ctx, |ui| {
             crate::ui::timer_view::render(ui, &mut self.timer, &self.active_profile, self.window_size);
         });
+
+        // Save window position in memory
+        if let Some(outer_rect) = ctx.input(|i| i.viewport().outer_rect) {
+            let pos = outer_rect.min;
+            self.config.global.window_x = Some(pos.x);
+            self.config.global.window_y = Some(pos.y);
+        }
+    }
+
+    fn on_exit(&mut self) {
+        self.config.save();
     }
 }
