@@ -1,7 +1,5 @@
 use eframe::egui;
 
-pub mod context_menu;
-pub mod settings;
 pub mod timer_view;
 
 pub struct FlashState {
@@ -42,24 +40,16 @@ impl FlashState {
 }
 
 pub struct UiState {
-    pub show_context_menu: bool,
-    pub context_menu_pos: egui::Pos2,
-    pub show_settings: bool,
     pub dragging: bool,
     pub drag_start_offset: egui::Vec2,
-    pub interaction_mode: bool,
     pub flash: FlashState,
 }
 
 impl Default for UiState {
     fn default() -> Self {
         Self {
-            show_context_menu: false,
-            context_menu_pos: egui::Pos2::ZERO,
-            show_settings: false,
             dragging: false,
             drag_start_offset: egui::Vec2::ZERO,
-            interaction_mode: false,
             flash: FlashState::new(1.0),
         }
     }

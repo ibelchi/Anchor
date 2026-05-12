@@ -85,6 +85,29 @@ impl TimerState {
         }
     }
 
+    pub fn prev_phase(&mut self, profile: &Profile) {
+        self.running = false;
+        match self.phase {
+            Phase::Work => {
+                if self.cycle_count == 0 {
+                    self.remaining_secs = profile.work_secs;
+                } else {
+                    self.cycle_count -= 1;
+                    if profile.kind == ProfileKind::Classic && self.cycle_count >= profile.cycles_before_long {
+                        self.phase = Phase::LongBreak;
+                    } else {
+                        self.phase = Phase::ShortBreak;
+                    }
+                    self.remaining_secs = self.phase_duration(self.phase, profile);
+                }
+            }
+            Phase::ShortBreak | Phase::LongBreak => {
+                self.phase = Phase::Work;
+                self.remaining_secs = profile.work_secs;
+            }
+        }
+    }
+
     pub fn start(&mut self) {
         self.running = true;
     }

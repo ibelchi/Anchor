@@ -1,29 +1,22 @@
 use crate::timer::{Phase, Profile, ProfileKind, TimerState};
 use eframe::egui;
 
-/// Dibuixa un comptador de cicles amb punts horitzontals.
-///
-/// Nota: S'ha de saltar la renderització completament si el perfil és "No long break" (responsabilitat de qui crida).
-pub fn draw_cycle_counter(ui: &mut egui::Ui, completed: u32, total: u32, accent_color: egui::Color32) {
-    if total == 0 {
-        return;
-    }
-    
-    let radius = 5.0;
-    let spacing = 14.0;
+pub fn draw_cycle_counter(ui: &mut egui::Ui, completed: u32, total: u32, accent_color: egui::Color32, scale: f32) {
+    if total == 0 { return; }
+
+    let radius = 3.0 * scale;
+    let spacing = 10.0 * scale;
     let width = (total - 1) as f32 * spacing + radius * 2.0;
     let height = radius * 2.0;
-    
+
     let (rect, _) = ui.allocate_exact_size(egui::vec2(width, height), egui::Sense::hover());
-    
     let painter = ui.painter();
     let center_y = rect.center().y;
     let start_x = rect.left() + radius;
-    
+
     for i in 0..total {
         let center_x = start_x + i as f32 * spacing;
         let center = egui::pos2(center_x, center_y);
-        
         if i < completed {
             painter.circle_filled(center, radius, accent_color);
         } else {
@@ -33,37 +26,121 @@ pub fn draw_cycle_counter(ui: &mut egui::Ui, completed: u32, total: u32, accent_
 }
 
 pub fn render(ui: &mut egui::Ui, timer: &mut TimerState, profile: &Profile, size: crate::app::WindowSize) {
-    ui.vertical_centered(|ui| {
-        let mins = timer.remaining_secs / 60;
-        let secs = timer.remaining_secs % 60;
-        let time_str = format!("{:02}:{:02}", mins, secs);
+    let (font_size, phase_font_size, top_space, mid_space, scale) = match size {
+        crate::app::WindowSize::S => (14.0, 9.0,  2.0, 1.0, 0.6),
+        crate::app::WindowSize::M => (28.0, 14.0, 8.0, 3.0, 1.0),
+        crate::app::WindowSize::L => (42.0, 18.0, 14.0, 6.0, 1.4),
+    };
 
-        let font_size = match size {
-            crate::app::WindowSize::S => 18.0,
-            crate::app::WindowSize::M => 28.0,
-            crate::app::WindowSize::L => 42.0,
-        };
+    let btn_size = (14.0_f32 * scale).max(10.0_f32);
+    let grip_size = (20.0_f32 * scale).max(12.0_f32);
+    let icon_color = egui::Color32::from_white_alpha(180);
 
-        ui.add_space(10.0);
-        ui.heading(egui::RichText::new(time_str).size(font_size).strong());
+    // Fila superior: espai + botó ✕ a la dreta
+    ui.with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+        ui.add_space(2.0);
+        if ui.add(
+            egui::Button::new(egui::RichText::new("✕").size(btn_size).color(icon_color))
+                .frame(false)
+        ).clicked() {
+            ui.ctx().send_viewport_cmd(egui::ViewportCommand::Close);
+        }
+    });
 
-        let phase_name = match timer.phase {
-            Phase::Work => "Work",
-            Phase::ShortBreak => "Short Break",
-            Phase::LongBreak => "Long Break",
-        };
-        ui.label(egui::RichText::new(phase_name).size(14.0));
+    // Zona central: timer + fase + cicles
+    // Usem el espai restant menys la fila de controls inferiors
+    let controls_height = grip_size + 4.0;
+    let available = ui.available_size();
+    ui.allocate_ui(egui::vec2(available.x, available.y - controls_height), |ui| {
+        ui.vertical_centered(|ui| {
+            let mins = timer.remaining_secs / 60;
+            let secs = timer.remaining_secs % 60;
+            let time_str = format!("{:02}:{:02}", mins, secs);
 
-        if profile.kind == ProfileKind::Classic {
-            ui.add_space(5.0);
-            
-            let accent_color = match timer.phase {
-                Phase::Work => egui::Color32::from_rgb(255, 100, 100),
-                Phase::ShortBreak => egui::Color32::from_rgb(100, 255, 100),
-                Phase::LongBreak => egui::Color32::from_rgb(100, 100, 255),
+            ui.add_space(top_space);
+            ui.heading(egui::RichText::new(time_str).size(font_size).strong());
+
+            let phase_name = match timer.phase {
+                Phase::Work => "Work",
+                Phase::ShortBreak => "Short Break",
+                Phase::LongBreak => "Long Break",
             };
-            
-            draw_cycle_counter(ui, timer.cycle_count, profile.cycles_before_long, accent_color);
+            ui.label(egui::RichText::new(phase_name).size(phase_font_size));
+
+            if profile.kind == ProfileKind::Classic {
+                ui.add_space(mid_space);
+                let accent_color = match timer.phase {
+                    Phase::Work => egui::Color32::from_rgb(255, 100, 100),
+                    Phase::ShortBreak => egui::Color32::from_rgb(100, 255, 100),
+                    Phase::LongBreak => egui::Color32::from_rgb(100, 100, 255),
+                };
+                let display_completed = match timer.phase {
+                    Phase::Work => timer.cycle_count + 1,
+                    Phase::ShortBreak | Phase::LongBreak => timer.cycle_count,
+                };
+                draw_cycle_counter(ui, display_completed, profile.cycles_before_long, accent_color, scale);
+            }
+        });
+    });
+
+    // Fila inferior: ⏮⏭ a l'esquerra, ⏵ + grip a la dreta — tot en una sola fila
+    ui.with_layout(egui::Layout::left_to_right(egui::Align::BOTTOM), |ui| {
+        ui.add_space(2.0);
+
+        // Esquerra: nav
+        if ui.add(
+            egui::Button::new(egui::RichText::new("⏮").size(btn_size).color(icon_color))
+                .frame(false)
+        ).clicked() {
+            timer.prev_phase(profile);
+        }
+        if ui.add(
+            egui::Button::new(egui::RichText::new("⏭").size(btn_size).color(icon_color))
+                .frame(false)
+        ).clicked() {
+            timer.advance_phase(profile);
+        }
+
+        // Espai flexible al mig
+        let remaining = ui.available_width() - grip_size - btn_size - 8.0;
+        ui.add_space(remaining.max(0.0));
+
+        // Play/pause
+        let play_icon = if timer.running { "⏸" } else { "⏵" };
+        if ui.add(
+            egui::Button::new(egui::RichText::new(play_icon).size(btn_size).color(icon_color))
+                .frame(false)
+        ).clicked() {
+            timer.running = !timer.running;
+        }
+
+        ui.add_space(2.0);
+
+        // Grip de drag
+        let (rect, response) = ui.allocate_exact_size(
+            egui::vec2(grip_size, grip_size),
+            egui::Sense::drag(),
+        );
+
+        if response.drag_started() {
+            ui.ctx().send_viewport_cmd(egui::ViewportCommand::StartDrag);
+        }
+        if response.hovered() {
+            ui.ctx().set_cursor_icon(egui::CursorIcon::Grab);
+        }
+
+        let painter = ui.painter();
+        let line_color = egui::Color32::from_white_alpha(80);
+        let cx = rect.center().x;
+        let half = grip_size * 0.25;
+        let sy = rect.top() + grip_size * 0.25;
+        let sp = grip_size * 0.25;
+        for i in 0..3 {
+            let y = sy + i as f32 * sp;
+            painter.line_segment(
+                [egui::pos2(cx - half, y), egui::pos2(cx + half, y)],
+                egui::Stroke::new(1.0, line_color),
+            );
         }
     });
 }
