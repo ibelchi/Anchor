@@ -11,7 +11,6 @@ Floats above your windows, semi-transparent, always visible — without demandin
 ## What it does
 
 - Counts down. Notifies you. Gets out of the way.
-- Two profiles: **Classic** (25 / 5 / 15 min with long breaks) and **No long break**
 - Cycle counter so you always know where you are
 - Sound + visual flash on phase change — no Windows toast notifications
 - Remembers where you left it on screen
