@@ -109,7 +109,7 @@ impl eframe::App for App {
 
         let frame = egui::Frame::none().fill(egui::Color32::from_black_alpha(255));
         egui::CentralPanel::default().frame(frame).show(ctx, |ui| {
-            crate::ui::timer_view::render(ui, &mut self.timer, &self.active_profile, self.window_size);
+            crate::ui::timer_view::render(ui, &mut self.timer, &self.active_profile, &self.window_size);
         });
 
         // Save window position in memory
