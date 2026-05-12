@@ -249,40 +249,40 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 ## 8. Fases de desenvolupament
 
 ### Fase 1 — Esquelet funcional
-- [ ] Projecte Rust amb eframe
-- [ ] Finestra sense decoració, always-on-top
-- [ ] Timer bàsic que compta enrere
-- [ ] Cicle complet: treball / descans curt / descans llarg
-- [ ] Comptador de cicles intern
-- [ ] Dos perfils: Clàssic i Sense descans llarg
+- [x] Projecte Rust amb eframe
+- [x] Finestra sense decoració, always-on-top
+- [x] Timer bàsic que compta enrere
+- [x] Cicle complet: treball / descans curt / descans llarg
+- [x] Comptador de cicles intern
+- [x] Dos perfils: Clàssic i Sense descans llarg
 
 ### Fase 2 — Interacció
-- [ ] Menú contextual (clic dret)
-- [ ] Accions: iniciar, pausar, reiniciar, saltar, tancar
-- [ ] Canvi de perfil des del menú contextual
+- ~~Menú contextual (clic dret)~~ — eliminat, substituït per botons a la finestra
+- [x] Accions: iniciar, pausar, reiniciar, saltar, tancar
+- ~~Canvi de perfil des del menú contextual~~ — eliminat (perfils fixos)
 - [x] Drag de finestra
 
 ### Fase 3 — Comportament de finestra
-- [ ] Opacitat configurable
-- [ ] Click-through global + zona interactuable central
-- [ ] Mides S/M/L
+- [x] Opacitat configurable (via config.toml)
+- ~~Click-through global + zona interactuable central~~ — eliminat, finestra completament interactuable
+- [x] Mides S/M/L
 
 ### Fase 4 — Notificacions
 - [x] Integració rodio + tres sons inclosos (treball, descans curt, descans llarg)
 - [x] Flash visual en canvi de fase
-- [ ] Comptador de cicles visible a la UI (perfil Clàssic)
+- [x] Comptador de cicles visible a la UI (perfil Clàssic)
 
 ### Fase 5 — Configuració
 - [x] Estructura Config + serde/toml amb paràmetres per perfil
-- [ ] Panell de configuració UI (eliminat a favor d'edició manual)
+- ~~Panell de configuració UI~~ — eliminat a favor d'edició manual del config.toml
 - [x] Persistència de posició i configuració
 
 ### Fase 6 — Poliment
-- [ ] Colors per fase (treball, descans curt, descans llarg) configurables per perfil
-- [ ] Ajust tipografia i proporcions per mida
-- [ ] Test en diverses resolucions i DPI
-- [ ] Build release (mida executable, strip symbols)
-- [ ] README i llicència MIT
+- ~~Colors per fase configurables per perfil~~ — descartat
+- [x] Ajust tipografia i proporcions per mida
+- [x] Test en diverses resolucions i DPI
+- [x] Build release (mida executable, strip symbols, icona embeguda)
+- [x] README i llicència MIT
 
 ---
 
@@ -304,14 +304,35 @@ Primera execució: cantonada inferior dreta amb marge de 20px. Les execucions po
 - So personalitzat (fitxer extern configurable)
 - Versió Linux/macOS si egui ho permet sense canvis majors
 
-## 11. Estat actual d'implementació i bugs oberts
+## 11. Estat actual d'implementació
 
 ### Fases completades
 - Fase 1 ✅ Esquelet funcional (timer, cicle, perfils)
 - Fase 2 ✅ Interacció (drag, accions)
-- Fase 3 ✅ Comportament de finestra (opacitat, click-through, mides S/M/L)
+- Fase 3 ✅ Comportament de finestra (opacitat, mides S/M/L)
 - Fase 4 ✅ Notificacions (so + flash visual)
-- Fase 5 ⚠️ Parcialment completada: la UI de Settings ha estat eliminada (la configuració es gestiona editant manualment el fitxer config.toml), però s'ha implementat la persistència de la posició de la finestra.
+- Fase 5 ✅ Persistència (posició de finestra desada a config.toml)
+- Fase 6 ✅ Poliment (tipografia per mida, build release, icona, README, llicència MIT)
+
+### Arquitectura actual (diferències respecte al disseny original)
+- S'han afegit controls a la finestra:
+  - Superior dreta: botó de tancar `×`.
+  - Inferior esquerra: botons `⏮` i `⏭` per canviar de fase.
+  - Inferior dreta: botó Play/Pause `⏵`/`⏸` i grip de drag.
+- S'ha eliminat el click-through. La finestra és completament interactuable.
+- S'ha eliminat l'overlay Win32.
+- S'han eliminat els perfils configurables per l'usuari — dos perfils fixos: Classic i No Long Break.
+- El panell de configuració UI s'ha eliminat — la configuració es gestiona editant manualment `config.toml`.
+
+### Limitacions conegudes (v1.0)
+- Canviar `opacity` o `window_size` al config.toml requereix reiniciar l'app.
+- A mida S no es mostren els dots del comptador de cicles (espai insuficient).
+
+### Build
+- Optimitzat per mida: `opt-level = "z"`, LTO, `panic = "abort"`, strip de símbols.
+- Sense finestra de consola: `#![windows_subsystem = "windows"]`.
+- Icona embeguda a l'executable via `winres`.
+- Mida del binari release: ~8 MB.
 
 ### Arquitectura actual (diferències respecte al disseny original)
 - S'han afegit controls a la finestra:

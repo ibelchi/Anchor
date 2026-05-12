@@ -1,5 +1,9 @@
 # anchor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows-blue)](https://github.com/ibelchi/anchor/releases)
+[![Built with Rust](https://img.shields.io/badge/built%20with-Rust-orange)](https://www.rust-lang.org)
+
 A Pomodoro timer that stays out of your way.
 
 Floats above your windows, semi-transparent, always visible — without demanding attention. When you need it, it's there. When you don't, it barely exists.
@@ -11,6 +15,7 @@ Floats above your windows, semi-transparent, always visible — without demandin
 ## What it does
 
 - Counts down. Notifies you. Gets out of the way.
+- Two profiles: **Classic** (25 / 5 / 15 min with long breaks) and **No long break**
 - Cycle counter so you always know where you are
 - Sound + visual flash on phase change — no Windows toast notifications
 - Remembers where you left it on screen
@@ -29,7 +34,7 @@ Drop the `.exe`, run it, done.
 | Play / Pause | `⏵` button (bottom right) |
 | Previous / Next phase | `⏮` `⏭` buttons (bottom left) |
 | Move window | Drag grip (bottom right corner) |
-| Close | `✕` button (top right) |
+| Close | `×` button (top right) |
 
 ---
 
@@ -56,6 +61,8 @@ work_duration_secs = 1500
 short_break_secs = 300
 ```
 
+> Changing `opacity` or `window_size` requires a restart to take effect.
+
 ### Window sizes
 
 | Size | Dimensions | Best for |
@@ -69,7 +76,7 @@ short_break_secs = 300
 ## Building from source
 
 ```sh
-git clone https://github.com/youruser/anchor
+git clone https://github.com/ibelchi/anchor
 cd anchor
 cargo build --release
 ```
@@ -80,4 +87,8 @@ Requires Rust stable. Windows only.
 
 ## License
 
-MIT
+[MIT](LICENSE) © 2026 ibelchi
+
+---
+
+*Made with ☕ and focus by [belchi](https://ibelchi.github.io)*
